@@ -1,5 +1,7 @@
 bower_components/
-dist/*
+dist/*.*
 node_modules
 Procfile
 .DS_Store
+all.js
+main.css
