@@ -1,6 +1,7 @@
 
 angular.module(app_name)
-    .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function($stateProvider, $urlRouterProvider, $locationProvider) {
+    .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
+        function($stateProvider, $urlRouterProvider, $locationProvider) {
  
   /* Config for locationProvider */
   $locationProvider.html5Mode(true);

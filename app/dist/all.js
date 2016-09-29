@@ -1,6 +1,6 @@
 var app_name = "luna";
 
-angular.module(app_name, ['angular-loading-bar', 'ui.router', 'ngCookies']);
+angular.module(app_name, ['angular-loading-bar', 'ui.router', 'ngCookies','ngAnimate']);
 
 angular.module(app_name)
 .factory("authInterceptor", ['$q', '$window', function ($q, $window) {
@@ -32,7 +32,8 @@ angular.module(app_name)
     
 
 angular.module(app_name)
-    .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function($stateProvider, $urlRouterProvider, $locationProvider) {
+    .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
+        function($stateProvider, $urlRouterProvider, $locationProvider) {
  
   /* Config for locationProvider */
   $locationProvider.html5Mode(true);
@@ -99,39 +100,6 @@ angular.module(app_name)
 
 }]);
 
-angular.module(app_name)
-  .controller('OnboardController', [ '$scope', 'user_service', '$timeout', 
-    function($scope, user_service, $timeout){
-
-      var self = this;
-      /*$scope.register = user_service.register(
-        {
-              "password" : $scope.password
-        })
-        .then(function(data){
-            console.log("user registered", data.data)
-        });*/
-      console.log($scope);
-
-      self.register = function() {
-          var user = {
-              "username": "placeholder",
-              "password": self.password
-            }
-
-          user_service.register(user).then(function(data){
-                $timeout(function () {
-                    self.username = data.username;
-                });
-                console.log("user registered", data)
-        });
-
-      };
-
-  
-
-
-}]);
 angular.module(app_name).service('user_service', ['$q', '$http', function($q, $http){
 
      var self = this;
@@ -154,6 +122,40 @@ angular.module(app_name).service('user_service', ['$q', '$http', function($q, $h
         });
         });
      };
+
+
+}]);
+angular.module(app_name)
+  .controller('OnboardController', [ '$scope', 'user_service', '$timeout', '$state',
+    function($scope, user_service, $timeout, $state){
+
+      var self = this;
+      /*$scope.register = user_service.register(
+        {
+              "password" : $scope.password
+        })
+        .then(function(data){
+            console.log("user registered", data.data)
+        });*/
+      console.log($scope);
+
+      self.register = function() {
+          var user = {
+              "username": "placeholder",
+              "password": self.password
+            }
+
+          user_service.register(user).then(function(data){
+                $timeout(function () {
+                    self.username = data.username;
+                });
+                console.log("user registered", data)
+                $state.go('onboard.confirm');
+        });
+
+      };
+
+  
 
 
 }]);
