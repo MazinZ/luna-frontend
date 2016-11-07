@@ -41,44 +41,15 @@ angular.module(app_name)
 
   $urlRouterProvider.otherwise('/');
   $stateProvider
-    .state('main', {
-      views: {
-        'nav': {
-          templateUrl: '/templates/common/navbar.html',
-          controller: 'NavbarController'
+      .state('privacy', {
+        url: '/privacy',
+        views: {
+          'content@': {
+          templateUrl: '/app/templates/onboard/privacy.html',
+          controller: 'PrivacyController'
         }
       }
     })
-    .state('form', {
-        templateUrl: 'form.html',
-        controller: 'formController'
-    })
-    .state('main.index', {
-      url: '/',
-      views: {
-        'content@': {
-          template: ' ',
-        }
-      }
-    })
-    /*.state('main.sign_in', {
-      url: '/login',
-      views: {
-        'content@': {
-        templateUrl: '/templates/users/login.html',
-        controller: 'SignInController'
-        }
-      }
-    })*/
-    /*.state('main.sign_up', {
-      url: '/register',
-      views: {
-        'content@': {
-        templateUrl: '/templates/users/register.html',
-        controller: 'SignUpController'
-        }
-      }
-    })*/
     .state('onboard', {
         url: '/onboard',
         views: {
@@ -100,6 +71,34 @@ angular.module(app_name)
 
 }]);
 
+angular.module(app_name)
+  .controller('OnboardController', [ '$scope', 'user_service', '$timeout', '$state',
+    function($scope, user_service, $timeout, $state){
+      $state.go('onboard.register');
+      var self = this;
+
+      self.register = function() {
+          var user = {
+              "username": "placeholder",
+              "password": self.password
+            }
+
+          user_service.register(user).then(function(data){
+                $timeout(function () {
+                    self.username = data.username;
+                });
+                console.log("user registered", data)
+                $state.go('onboard.confirm');
+        });
+
+      };
+}]);
+
+angular.module(app_name).controller('PrivacyController', ['$scope', '$state', function($scope, $state){
+    $scope.goToOnboard = function(){
+        $state.go('onboard');
+    }
+}]);
 angular.module(app_name).service('user_service', ['$q', '$http', function($q, $http){
 
      var self = this;
@@ -122,40 +121,6 @@ angular.module(app_name).service('user_service', ['$q', '$http', function($q, $h
         });
         });
      };
-
-
-}]);
-angular.module(app_name)
-  .controller('OnboardController', [ '$scope', 'user_service', '$timeout', '$state',
-    function($scope, user_service, $timeout, $state){
-
-      var self = this;
-      /*$scope.register = user_service.register(
-        {
-              "password" : $scope.password
-        })
-        .then(function(data){
-            console.log("user registered", data.data)
-        });*/
-      console.log($scope);
-
-      self.register = function() {
-          var user = {
-              "username": "placeholder",
-              "password": self.password
-            }
-
-          user_service.register(user).then(function(data){
-                $timeout(function () {
-                    self.username = data.username;
-                });
-                console.log("user registered", data)
-                $state.go('onboard.confirm');
-        });
-
-      };
-
-  
 
 
 }]);

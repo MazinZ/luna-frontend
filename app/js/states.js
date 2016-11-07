@@ -9,44 +9,15 @@ angular.module(app_name)
 
   $urlRouterProvider.otherwise('/');
   $stateProvider
-    .state('main', {
-      views: {
-        'nav': {
-          templateUrl: '/templates/common/navbar.html',
-          controller: 'NavbarController'
+      .state('privacy', {
+        url: '/privacy',
+        views: {
+          'content@': {
+          templateUrl: '/app/templates/onboard/privacy.html',
+          controller: 'PrivacyController'
         }
       }
     })
-    .state('form', {
-        templateUrl: 'form.html',
-        controller: 'formController'
-    })
-    .state('main.index', {
-      url: '/',
-      views: {
-        'content@': {
-          template: ' ',
-        }
-      }
-    })
-    /*.state('main.sign_in', {
-      url: '/login',
-      views: {
-        'content@': {
-        templateUrl: '/templates/users/login.html',
-        controller: 'SignInController'
-        }
-      }
-    })*/
-    /*.state('main.sign_up', {
-      url: '/register',
-      views: {
-        'content@': {
-        templateUrl: '/templates/users/register.html',
-        controller: 'SignUpController'
-        }
-      }
-    })*/
     .state('onboard', {
         url: '/onboard',
         views: {

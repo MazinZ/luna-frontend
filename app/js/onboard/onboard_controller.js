@@ -1,16 +1,8 @@
 angular.module(app_name)
   .controller('OnboardController', [ '$scope', 'user_service', '$timeout', '$state',
     function($scope, user_service, $timeout, $state){
-
+      $state.go('onboard.register');
       var self = this;
-      /*$scope.register = user_service.register(
-        {
-              "password" : $scope.password
-        })
-        .then(function(data){
-            console.log("user registered", data.data)
-        });*/
-      console.log($scope);
 
       self.register = function() {
           var user = {
@@ -27,8 +19,4 @@ angular.module(app_name)
         });
 
       };
-
-  
-
-
 }]);
