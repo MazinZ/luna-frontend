@@ -1,5 +1,5 @@
 angular.module(app_name)
-.factory("authInterceptor", ['$q', '$window', function ($q, $window) {
+.factory("authInterceptor", ['$q', '$window', '$injector',function ($q, $window, $injector) {
   return {
    'request': function(config) {
         if ($window.localStorage.token) config.headers['Authorization'] = 'Token ' + $window.localStorage.token;
@@ -9,6 +9,12 @@ angular.module(app_name)
 
     'response': function(response) {
         return response;
+    },
+    'responseError': function(rejection) {
+      if (rejection.status == 401 || rejection.status == 400) {
+       $injector.get("Notification").error(rejection.data.non_field_errors[0])
+      }
+      return $q.reject(rejection);
     }
   };
 }]);
