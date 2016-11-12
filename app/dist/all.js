@@ -1,7 +1,20 @@
 var app_name = "luna";
 
-angular.module(app_name, ['angular-loading-bar', 'ui.router', 'ngCookies','ngAnimate']);
+angular.module(app_name, ['angular-loading-bar', 'ui.router', 'ngCookies','ngAnimate','notification']);
 
+angular.module('notification', ['ui-notification'])
+    .config(function(NotificationProvider) {
+        NotificationProvider.setOptions({
+            delay: 10000,
+            startTop: 20,
+            startRight: 10,
+            verticalSpacing: 20,
+            horizontalSpacing: 20,
+            positionX: 'right',
+            positionY: 'bottom',
+            closeOnClick: false
+        });
+    });
 angular.module(app_name)
 .factory("authInterceptor", ['$q', '$window', function ($q, $window) {
   return {
@@ -72,8 +85,8 @@ angular.module(app_name)
 }]);
 
 angular.module(app_name)
-  .controller('OnboardController', [ '$scope', 'user_service', '$timeout', '$state',
-    function($scope, user_service, $timeout, $state){
+  .controller('OnboardController', [ '$scope', 'user_service', '$timeout', '$state', 'Notification',
+    function($scope, user_service, $timeout, $state, Notification){
       $state.go('onboard.register');
       var self = this;
 
@@ -87,10 +100,8 @@ angular.module(app_name)
                 $timeout(function () {
                     self.username = data.username;
                 });
-                console.log("user registered", data)
                 $state.go('onboard.confirm');
         });
-
       };
 }]);
 
@@ -99,20 +110,23 @@ angular.module(app_name).controller('PrivacyController', ['$scope', '$state', fu
         $state.go('onboard');
     }
 }]);
-angular.module(app_name).controller('AdminController', ['user_service', '$scope', function(user_service, $scope){
+angular.module(app_name).controller('AdminController', ['user_service', '$scope', 'Notification', function(user_service, $scope, Notification){
     $scope.user = {"username": '', "password": '' }
     $scope.showSubmit = false;
     if (user_service.is_signed_in()) $scope.signed_in = true;
     else $scope.signed_in = false;
 
     $scope.sign_in = function() {
+      $scope.showSubmit = false;
+      Notification.info('Retrieving data...');
       user_service.sign_in({
           "username" : $scope.user.username, 
           "password" : $scope.user.password
-        })
+        });
     }
 }]);
-angular.module(app_name).service('user_service', ['$q', '$http', '$rootScope',function($q, $http, $rootScope){
+angular.module(app_name).service('user_service', ['$q', '$http', '$rootScope', 'Notification', '$window',
+    function($q, $http, $rootScope, Notification, $window){
 
      var self = this;
 
@@ -138,7 +152,7 @@ angular.module(app_name).service('user_service', ['$q', '$http', '$rootScope',fu
     self.sign_in = function(user){
         $http({
             method: 'POST',
-            url: 'api/v1/auth/login/',
+            url: '/api/v1/auth/login/',
             data: user
         })
         .then(function(data){
@@ -160,9 +174,20 @@ angular.module(app_name).service('user_service', ['$q', '$http', '$rootScope',fu
                 method: 'GET',
                 url: 'https://luna-c2c2f.firebaseio.com/Users.json?auth=' + data._lat
             }).then(function(data){
-                var url = 'data:text/json;charset=utf8,' + JSON.stringify(data.data);
-                window.open(url, '_blank');
-                window.focus();
+                $http({
+                    method: 'POST',
+                    url: '/api/v1/export/',
+                    data: {'content' : data.data}
+                }).then(function(data, status, headers, config){
+                      var anchor = angular.element('<a/>');
+                      anchor.attr({
+                        href: 'data:attachment/csv;charset=utf-8,' + encodeURI(data.data),
+                        target: '_blank',
+                        download: 'data' + moment().format() + '.csv'
+                      })[0].click()
+                        Notification.success('Data retrieved successfully.');
+                    });
+
             });
         });
     }

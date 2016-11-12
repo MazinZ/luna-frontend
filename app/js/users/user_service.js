@@ -1,4 +1,5 @@
-angular.module(app_name).service('user_service', ['$q', '$http', '$rootScope',function($q, $http, $rootScope){
+angular.module(app_name).service('user_service', ['$q', '$http', '$rootScope', 'Notification', '$window',
+    function($q, $http, $rootScope, Notification, $window){
 
      var self = this;
 
@@ -24,7 +25,7 @@ angular.module(app_name).service('user_service', ['$q', '$http', '$rootScope',fu
     self.sign_in = function(user){
         $http({
             method: 'POST',
-            url: 'api/v1/auth/login/',
+            url: '/api/v1/auth/login/',
             data: user
         })
         .then(function(data){
@@ -46,9 +47,20 @@ angular.module(app_name).service('user_service', ['$q', '$http', '$rootScope',fu
                 method: 'GET',
                 url: 'https://luna-c2c2f.firebaseio.com/Users.json?auth=' + data._lat
             }).then(function(data){
-                var url = 'data:text/json;charset=utf8,' + JSON.stringify(data.data);
-                window.open(url, '_blank');
-                window.focus();
+                $http({
+                    method: 'POST',
+                    url: '/api/v1/export/',
+                    data: {'content' : data.data}
+                }).then(function(data, status, headers, config){
+                      var anchor = angular.element('<a/>');
+                      anchor.attr({
+                        href: 'data:attachment/csv;charset=utf-8,' + encodeURI(data.data),
+                        target: '_blank',
+                        download: 'data' + moment().format() + '.csv'
+                      })[0].click()
+                        Notification.success('Data retrieved successfully.');
+                    });
+
             });
         });
     }

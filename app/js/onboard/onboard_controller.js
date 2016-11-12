@@ -1,6 +1,6 @@
 angular.module(app_name)
-  .controller('OnboardController', [ '$scope', 'user_service', '$timeout', '$state',
-    function($scope, user_service, $timeout, $state){
+  .controller('OnboardController', [ '$scope', 'user_service', '$timeout', '$state', 'Notification',
+    function($scope, user_service, $timeout, $state, Notification){
       $state.go('onboard.register');
       var self = this;
 
@@ -14,9 +14,7 @@ angular.module(app_name)
                 $timeout(function () {
                     self.username = data.username;
                 });
-                console.log("user registered", data)
                 $state.go('onboard.confirm');
         });
-
       };
 }]);
